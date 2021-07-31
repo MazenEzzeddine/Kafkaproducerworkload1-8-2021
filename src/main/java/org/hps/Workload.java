@@ -46,8 +46,8 @@ public class Workload {
             targetXPointValue = Double.parseDouble(workFields[1]);
             datax.add(inputXPointValue);
             datay.add(targetXPointValue);
-            System.out.println(inputXPointValue);
-            System.out.println(targetXPointValue);
+           /* System.out.println(inputXPointValue);
+            System.out.println(targetXPointValue);*/
         }
     }
 }

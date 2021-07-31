@@ -21,12 +21,13 @@ public class KafkaProducerExample {
     private static long iteration =0;
     private static Random rnd = new Random();
     public static void main(String[] args) throws InterruptedException, IOException, URISyntaxException {
+        log.info("this is the new version");
         Workload wrld = new Workload();
         KafkaProducerConfig config = KafkaProducerConfig.fromEnv();
         log.info(KafkaProducerConfig.class.getName() + ": {}", config.toString());
         Properties props = KafkaProducerConfig.createProperties(config);
         int delay = config.getDelay();
-        KafkaProducer producer = new KafkaProducer<String,Customer>(props);
+        KafkaProducer<String,Customer> producer = new KafkaProducer<String,Customer>(props);
         log.info("Sending {} messages ...", config.getMessageCount());
         boolean blockProducer = System.getenv("BLOCKING_PRODUCER") != null;
         AtomicLong numSent = new AtomicLong(0);
@@ -39,10 +40,11 @@ public class KafkaProducerExample {
 
                 Customer cust = new Customer(rnd.nextInt(), UUID.randomUUID().toString());
                /* log.info("Sending messages \"" + config.getMessage() + " - {}\"{}", i);*/
+                log.info("sending the customer {}", cust.toString());
                 Future<RecordMetadata> recordMetadataFuture =
-                        producer.send(new ProducerRecord(config.getTopic(),
+                        producer.send(new ProducerRecord<String, Customer>(config.getTopic(),
                         null, null,
-                        UUID.randomUUID().toString() /*null*/, "\"" +  cust + " - " + i));
+                        UUID.randomUUID().toString() /*null*/, cust));
                 if(blockProducer) {
                     try {
                         recordMetadataFuture.get();
@@ -56,7 +58,7 @@ public class KafkaProducerExample {
                     numSent.incrementAndGet();
                 }
             }
-            log.info("iteration{}", iteration);
+            log.info("iteration {}", iteration);
             log.info("{} messages sent ...", Math.ceil(wrld.getDatay().get(i)));
             iteration++;
             log.info("sleeping for {} seconds", delay);

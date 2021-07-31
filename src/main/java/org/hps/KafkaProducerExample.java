@@ -9,6 +9,7 @@ import java.net.URISyntaxException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Properties;
+import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -18,13 +19,14 @@ public class KafkaProducerExample {
     private static final Logger log = LogManager.getLogger(KafkaProducerExample.class);
     private static Instant start = null;
     private static long iteration =0;
+    private static Random rnd = new Random();
     public static void main(String[] args) throws InterruptedException, IOException, URISyntaxException {
         Workload wrld = new Workload();
         KafkaProducerConfig config = KafkaProducerConfig.fromEnv();
         log.info(KafkaProducerConfig.class.getName() + ": {}", config.toString());
         Properties props = KafkaProducerConfig.createProperties(config);
         int delay = config.getDelay();
-        KafkaProducer producer = new KafkaProducer(props);
+        KafkaProducer producer = new KafkaProducer<String,Customer>(props);
         log.info("Sending {} messages ...", config.getMessageCount());
         boolean blockProducer = System.getenv("BLOCKING_PRODUCER") != null;
         AtomicLong numSent = new AtomicLong(0);
@@ -34,11 +36,13 @@ public class KafkaProducerExample {
                     Math.ceil(wrld.getDatay().get(i)));
             //   loop over each sample
             for (long j = 0; j < Math.ceil(wrld.getDatay().get(i)); j++) {
+
+                Customer cust = new Customer(rnd.nextInt(), UUID.randomUUID().toString());
                /* log.info("Sending messages \"" + config.getMessage() + " - {}\"{}", i);*/
                 Future<RecordMetadata> recordMetadataFuture =
                         producer.send(new ProducerRecord(config.getTopic(),
                         null, null,
-                        UUID.randomUUID().toString() /*null*/, "\"" + config.getMessage() + " - " + i));
+                        UUID.randomUUID().toString() /*null*/, "\"" +  cust + " - " + i));
                 if(blockProducer) {
                     try {
                         recordMetadataFuture.get();

@@ -57,7 +57,7 @@ public class KafkaProducerConfig {
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,
                 "org.apache.kafka.common.serialization.StringSerializer");
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
-                "org.apache.kafka.common.serialization.StringSerializer");
+                CustomerSerializer.class);
         //props.put(ProducerConfig., "org.apache.kafka.common.serialization.StringSerializer");
         if (!config.getAdditionalConfig().isEmpty()) {
             StringTokenizer tok =
